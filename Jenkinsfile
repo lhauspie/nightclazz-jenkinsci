@@ -6,8 +6,8 @@ pipeline {
         node {
           label 'maven-jdk8'
         }
+        
       }
-
       steps {
         echo 'Building...'
         sh './scripts/build.sh'
@@ -16,24 +16,52 @@ pipeline {
         success {
           archiveArtifacts 'target/*.jar'
           stash(name: 'build-result', allowEmpty: true, includes: 'target/**/*')
+          
         }
+        
       }
     }
-
     stage('Test') {
-      agent {
-        node {
-          label 'java8'
+      parallel {
+        stage('Test Java8') {
+          agent {
+            node {
+              label 'java8'
+            }
+            
+          }
+          steps {
+            unstash 'build-result'
+            echo 'Java8 Testing...'
+            sh './scripts/test.sh'
+          }
+          post {
+            always {
+              junit 'target/surefire-reports/**/*.xml'
+              
+            }
+            
+          }
         }
-      }
-      steps {
-        unstash 'build-result'
-        echo 'Testing...'
-        sh './scripts/test.sh'
-      }
-      post {
-        always {
-          junit 'target/surefire-reports/**/*.xml'
+        stage('Test Java7') {
+          agent {
+            node {
+              label 'java7'
+            }
+            
+          }
+          steps {
+            unstash 'build-result'
+            echo 'Java7 Testing...'
+            sh './scripts/test.sh'
+          }
+          post {
+            always {
+              junit 'target/surefire-reports/**/*.xml'
+              
+            }
+            
+          }
         }
       }
     }
