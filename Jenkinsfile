@@ -3,10 +3,9 @@ pipeline {
   stages {
     stage('Build') {
       agent {
-        node {
-          label 'maven-jdk8'
+        dockerfile {
+          filename 'Dockerfile.build'
         }
-        
       }
       steps {
         echo 'Building...'
@@ -16,19 +15,17 @@ pipeline {
         success {
           archiveArtifacts 'target/*.jar'
           stash(name: 'build-result', allowEmpty: true, includes: 'target/**/*')
-          
         }
-        
       }
     }
     stage('Test') {
       parallel {
         stage('Test Java8') {
           agent {
-            node {
-              label 'java8'
+            docker {
+              image 'maven:3-jdk-8-alpine'
+              label 'jdk-8-alpine'
             }
-            
           }
           steps {
             unstash 'build-result'
@@ -38,17 +35,14 @@ pipeline {
           post {
             always {
               junit 'target/surefire-reports/**/*.xml'
-              
             }
-            
           }
         }
         stage('Test Java7') {
           agent {
             node {
-              label 'java7'
+              label 'maven-jdk7'
             }
-            
           }
           steps {
             unstash 'build-result'
@@ -58,9 +52,7 @@ pipeline {
           post {
             always {
               junit 'target/surefire-reports/**/*.xml'
-              
             }
-            
           }
         }
       }
