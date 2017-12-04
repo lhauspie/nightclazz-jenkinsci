@@ -4,13 +4,13 @@ pipeline {
     stage('Build') {
       steps {
         sh './scripts/build.sh'
-        archiveArtifacts './target/*.jar'
+        archiveArtifacts 'target/*.jar'
       }
     }
     stage('Test') {
       steps {
         sh './scripts/test.sh'
-        junit './target/**/*.xml'
+        junit 'target/**/*.xml'
       }
     }
     stage('Deploy') {
