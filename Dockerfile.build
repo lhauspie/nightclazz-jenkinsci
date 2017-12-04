@@ -1,0 +1,7 @@
+FROM maven:3-jdk-8-alpine
+
+# Install Some tools
+RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.6/community \
+  bats \
+  docker \
+  git

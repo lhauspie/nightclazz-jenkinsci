@@ -1,2 +1,4 @@
-# nigthclazz-jenkinsci
-The project I made during the Jenkins CI of NightClazz by Zenika Lille
+# Demo App
+
+This application is used for demonstrating Jenkins Pipeline
+capabilities.
