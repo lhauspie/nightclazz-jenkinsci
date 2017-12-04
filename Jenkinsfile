@@ -5,16 +5,25 @@ pipeline {
       steps {
         echo 'Building...'
         sh './scripts/build.sh'
-        archiveArtifacts 'target/*.jar'
-        stash(name: 'build-result', allowEmpty: true, includes: 'target/**/*')
+      }
+      post {
+        success {
+          archiveArtifacts 'target/*.jar'
+          stash(name: 'build-result', allowEmpty: true, includes: 'target/**/*')
+        }
       }
     }
+
     stage('Test') {
       steps {
+        unstash 'build-result'
         echo 'Testing...'
         sh './scripts/test.sh'
-        junit 'target/**/*.xml'
-        unstash 'build-result'
+      }
+      post {
+        always {
+          junit 'target/surefire-reports/**/*.xml'
+        }
       }
     }
     stage('Deploy') {
