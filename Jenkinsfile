@@ -25,7 +25,7 @@ pipeline {
           agent {
             docker {
               image 'maven:3-jdk-8-alpine'
-              label 'jdk-8-alpine'
+              label 'docker'
             }
           }
           steps {
