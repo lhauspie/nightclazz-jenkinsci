@@ -60,11 +60,23 @@ pipeline {
     }
     stage('Approval') {
       agent none
+      when {
+        anyOf {
+          branch 'master'
+          environment name: 'FORCE_DEPLOY', value: 'true'
+        }
+      }
       steps {
         input(message: 'Do you approve this release ?', id: 'approve-release', ok: 'Yes !')
       }
     }
     stage('Deploy') {
+      when {
+        anyOf {
+          branch 'master'
+          environment name: 'FORCE_DEPLOY', value: 'true'
+        }
+      }
       steps {
         echo 'Deploying...'
         sh './scripts/deploy.sh'
