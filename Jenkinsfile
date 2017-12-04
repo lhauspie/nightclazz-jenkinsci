@@ -2,12 +2,12 @@ pipeline {
   agent any
   stages {
     stage('Build') {
-      agent {
-        dockerfile {
-          filename 'Dockerfile.build'
-          label 'docker'
-        }
-      }
+//      agent {
+//        dockerfile {
+//          filename 'Dockerfile.build'
+//          label 'docker'
+//        }
+//      }
       steps {
         echo 'Building...'
         sh './scripts/build.sh'
@@ -56,6 +56,12 @@ pipeline {
             }
           }
         }
+      }
+    }
+    stage('Approval') {
+      agent none
+      steps {
+        input(message: 'Do you approve this release ?', id: 'approve-release', ok: 'Yes !')
       }
     }
     stage('Deploy') {
