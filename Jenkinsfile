@@ -1,91 +1,93 @@
 pipeline {
-  agent {
-    docker {
-      image 'maven:3-alpine'
-      args '-v /root/.m2:/root/.m2'
+    agent any
+
+    tools {
+        maven 'Maven 3.3.9'
+        jdk 'jdk8'
     }
-  }
-  stages {
-    stage('Build') {
+
+    stages {
+        stage('Build') {
 //      agent {
 //        dockerfile {
 //          filename 'Dockerfile.build'
 //          label 'docker'
 //        }
 //      }
-      steps {
-        echo 'Building...'
-        sh './scripts/build.sh'
-      }
-      post {
-        success {
-          archiveArtifacts 'target/*.jar'
-          stash(name: 'build-result', allowEmpty: true, includes: 'target/**/*')
-        }
-      }
-    }
-    stage('Test') {
-      parallel {
-        stage('Test Java8') {
-          agent {
-            docker {
-              image 'maven:3-jdk-8-alpine'
-              label 'docker'
+            steps {
+                echo 'Building...'
+//                sh './scripts/build.sh'
             }
-          }
-          steps {
-            unstash 'build-result'
-            echo 'Java8 Testing...'
-            sh './scripts/test.sh'
-          }
-          post {
-            always {
-              junit 'target/surefire-reports/**/*.xml'
-            }
-          }
+//            post {
+//                success {
+//                    archiveArtifacts 'target/*.jar'
+//                    stash(name: 'build-result', allowEmpty: true, includes: 'target/**/*')
+//                }
+//            }
         }
-        stage('Test Java7') {
-          agent {
-            node {
-              label 'maven-jdk7'
-            }
-          }
-          steps {
-            unstash 'build-result'
-            echo 'Java7 Testing...'
-            sh './scripts/test.sh'
-          }
-          post {
-            always {
-              junit 'target/surefire-reports/**/*.xml'
-            }
-          }
-        }
-      }
+
+//    stage('Test') {
+//      parallel {
+//        stage('Test Java8') {
+//          agent {
+//            docker {
+//              image 'maven:3-jdk-8-alpine'
+//              label 'docker'
+//            }
+//          }
+//          steps {
+//            unstash 'build-result'
+//            echo 'Java8 Testing...'
+//            sh './scripts/test.sh'
+//          }
+//          post {
+//            always {
+//              junit 'target/surefire-reports/**/*.xml'
+//            }
+//          }
+//        }
+//        stage('Test Java7') {
+//          agent {
+//            node {
+//              label 'maven-jdk7'
+//            }
+//          }
+//          steps {
+//            unstash 'build-result'
+//            echo 'Java7 Testing...'
+//            sh './scripts/test.sh'
+//          }
+//          post {
+//            always {
+//              junit 'target/surefire-reports/**/*.xml'
+//            }
+//          }
+//        }
+//      }
+//    }
+//    stage('Approval') {
+//      agent none
+//      when {
+//        anyOf {
+//          branch 'master'
+//          environment name: 'FORCE_DEPLOY', value: 'true'
+//        }
+//      }
+//      steps {
+//        input(message: 'Do you approve this release ?', id: 'approve-release', ok: 'Yes !')
+//      }
+//    }
+//    stage('Deploy') {
+//      when {
+//        anyOf {
+//          branch 'master'
+//          environment name: 'FORCE_DEPLOY', value: 'true'
+//        }
+//      }
+//      steps {
+//        echo 'Deploying...'
+//        sh './scripts/deploy.sh'
+//      }
+//    }
     }
-    stage('Approval') {
-      agent none
-      when {
-        anyOf {
-          branch 'master'
-          environment name: 'FORCE_DEPLOY', value: 'true'
-        }
-      }
-      steps {
-        input(message: 'Do you approve this release ?', id: 'approve-release', ok: 'Yes !')
-      }
-    }
-    stage('Deploy') {
-      when {
-        anyOf {
-          branch 'master'
-          environment name: 'FORCE_DEPLOY', value: 'true'
-        }
-      }
-      steps {
-        echo 'Deploying...'
-        sh './scripts/deploy.sh'
-      }
-    }
-  }
 }
