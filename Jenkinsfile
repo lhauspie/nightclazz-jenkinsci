@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'Maven 3.5.2'
+        jdk 'jdk8'
+    }
+
     stages {
         stage('Build') {
 //      agent {
@@ -11,7 +16,7 @@ pipeline {
 //      }
             steps {
                 echo 'Building...'
-//                sh './scripts/build.sh'
+                sh './scripts/build.sh'
             }
 //            post {
 //                success {
