@@ -9,10 +9,9 @@ pipeline {
     stages {
         stage ('Initialize') {
             steps {
-                sh '''
-                    echo "PATH = ${PATH}"
-                    echo "M2_HOME = ${M2_HOME}"
-                '''
+                sh 'echo "PATH = ${PATH}"'
+                sh 'echo "M2_HOME = ${M2_HOME}"'
+                sh 'echo "JAVA_HOME = ${JAVA_HOME}"'
 
                 sh 'java -version'
                 sh 'mvn -version'
@@ -30,12 +29,12 @@ pipeline {
                 echo 'Building...'
                 sh './scripts/build.sh'
             }
-//            post {
-//                success {
-//                    archiveArtifacts 'target/*.jar'
-//                    stash(name: 'build-result', allowEmpty: true, includes: 'target/**/*')
-//                }
-//            }
+            post {
+                success {
+                    archiveArtifacts 'target/*.jar'
+                    stash(name: 'build-result', allowEmpty: true, includes: 'target/**/*')
+                }
+            }
         }
 
 //    stage('Test') {
@@ -77,6 +76,7 @@ pipeline {
 //        }
 //      }
 //    }
+
 //    stage('Approval') {
 //      agent none
 //      when {
@@ -89,6 +89,7 @@ pipeline {
 //        input(message: 'Do you approve this release ?', id: 'approve-release', ok: 'Yes !')
 //      }
 //    }
+
 //    stage('Deploy') {
 //      when {
 //        anyOf {
